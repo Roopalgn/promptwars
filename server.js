@@ -82,6 +82,11 @@ async function handler(req, res) {
   if (req.method === "POST" && url.pathname === "/api/analyze") {
     try {
       const body = JSON.parse(await readBody(req));
+      const filename = typeof body.filename === "string" ? body.filename : "uploaded-document.txt";
+      if (!/\.(txt|md)$/i.test(filename)) {
+        sendJson(res, 415, { error: "This demo accepts text or Markdown agreements. Export a PDF as .txt or .md before uploading." });
+        return;
+      }
       if (typeof body.content !== "string" || body.content.trim().length < 40) {
         sendJson(res, 400, { error: "Add a readable document before analyzing." });
         return;
@@ -95,7 +100,7 @@ async function handler(req, res) {
         return;
       }
       const document = parseDocument({
-        filename: typeof body.filename === "string" ? body.filename : "uploaded-document.txt",
+        filename,
         content: body.content,
       });
       if (!document.chunks.length) {

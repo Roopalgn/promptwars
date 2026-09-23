@@ -9,11 +9,11 @@ export const RED_FLAG_PATTERNS = [
   },
   {
     id: "pay-deduction",
-    title: "Unclear payout deductions",
-    severity: "Important",
+    title: "Payout deductions are permitted",
+    severity: "Notice",
     pattern: /deduct|deduction|recover.*from.*payout|penalty|fine/i,
-    rationale: "Deductions or penalties appear in this clause; the trigger, cap, or dispute process should be clear.",
-    action: "Ask for a written list of deductions and whether there is a maximum amount.",
+    rationale: "This clause permits deductions or penalties. Check that the stated triggers, limits, and dispute process match what you were told.",
+    action: "Keep the payout statement and use the stated dispute window if a deduction looks wrong.",
   },
   {
     id: "mandatory-arbitration",
@@ -46,13 +46,21 @@ export function scanRedFlags(chunks) {
   for (const pattern of RED_FLAG_PATTERNS) {
     const match = chunks.find((chunk) => pattern.pattern.test(`${chunk.heading} ${chunk.text}`));
     if (!match) continue;
+    const text = `${match.heading} ${match.text}`;
+    const hasDocumentedDeductionProcess = pattern.id === "pay-deduction"
+      && /shown in (?:the )?monthly payout statement/i.test(text)
+      && /dispute (?:a )?deduction within \d+ days/i.test(text);
     findings.push({
       id: pattern.id,
       title: pattern.title,
-      severity: pattern.severity,
-      rationale: pattern.rationale,
-      action: pattern.action,
-      citation: { clause: match.clause, page: match.page, chunkId: match.id },
+      severity: hasDocumentedDeductionProcess ? "Notice" : pattern.severity,
+      rationale: hasDocumentedDeductionProcess
+        ? "The clause describes permitted deductions and includes a statement/dispute process. Verify that the conditions match your onboarding materials."
+        : pattern.rationale,
+      action: hasDocumentedDeductionProcess
+        ? "Keep the payout statement and use the 15-day dispute window if a deduction looks wrong."
+        : pattern.action,
+      citation: { clause: match.clause, page: match.page, pageSource: match.pageSource, chunkId: match.id },
       excerpt: match.text.slice(0, 240),
     });
   }

@@ -1,4 +1,5 @@
 const MAX_DOCUMENT_CHARS = 1_400_000;
+const ESTIMATED_PAGE_CHARS = 1800;
 
 function cleanText(value) {
   return value
@@ -6,16 +7,6 @@ function cleanText(value) {
     .replace(/[ \t]+/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
-}
-
-function extractPdfText(raw) {
-  // Lightweight extraction for simple text PDFs. A production deployment should
-  // use a maintained PDF parser, but this keeps the no-dependency demo safe.
-  const matches = [...raw.matchAll(/\(([^()]*)\)\s*Tj/g)];
-  if (matches.length) return matches.map((match) => match[1]).join("\n");
-  return raw
-    .replace(/stream[\s\S]*?endstream/g, "")
-    .replace(/[^\x20-\x7E\n\r\f]/g, " ");
 }
 
 function looksLikeHeading(line) {
@@ -31,12 +22,13 @@ function clauseLabel(heading, index) {
 
 export function parseDocument({ filename, content }) {
   const safeName = String(filename || "uploaded-document.txt").slice(0, 160);
-  let raw = String(content || "").slice(0, MAX_DOCUMENT_CHARS);
-  if (/\.pdf$/i.test(safeName)) raw = extractPdfText(raw);
+  const raw = String(content || "").slice(0, MAX_DOCUMENT_CHARS);
   const normalized = cleanText(raw.replace(/\r\n?/g, "\n"));
   const lines = normalized.split("\n");
+  const hasPageMarkers = lines.some((line) => line.trim() === "\f" || /^page\s+\d+$/i.test(line.trim()));
   const chunks = [];
   let page = 1;
+  let characterOffset = 0;
   let current = null;
 
   const pushCurrent = () => {
@@ -48,6 +40,7 @@ export function parseDocument({ filename, content }) {
         clause: current.clause,
         heading: current.heading,
         page: current.page,
+        pageSource: current.pageSource,
         text,
       });
     }
@@ -63,11 +56,25 @@ export function parseDocument({ filename, content }) {
     }
     if (looksLikeHeading(line)) {
       pushCurrent();
-      current = { heading: line, clause: clauseLabel(line, chunks.length), page, text: "" };
+      const estimatedPage = Math.floor(characterOffset / ESTIMATED_PAGE_CHARS) + 1;
+      current = {
+        heading: line,
+        clause: clauseLabel(line, chunks.length),
+        page: hasPageMarkers ? page : estimatedPage,
+        pageSource: hasPageMarkers ? "document" : "estimated",
+        text: "",
+      };
       continue;
     }
-    if (!current) current = { heading: "Document context", clause: "Preamble", page, text: "" };
+    if (!current) current = {
+      heading: "Document context",
+      clause: "Preamble",
+      page: hasPageMarkers ? page : Math.floor(characterOffset / ESTIMATED_PAGE_CHARS) + 1,
+      pageSource: hasPageMarkers ? "document" : "estimated",
+      text: "",
+    };
     current.text += `${line} `;
+    characterOffset += line.length + 1;
   }
   pushCurrent();
 
@@ -75,6 +82,6 @@ export function parseDocument({ filename, content }) {
     filename: safeName,
     text: normalized,
     chunks,
-    pages: page,
+    pages: hasPageMarkers ? page : Math.max(1, Math.ceil(characterOffset / ESTIMATED_PAGE_CHARS)),
   };
 }

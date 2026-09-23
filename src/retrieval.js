@@ -13,9 +13,11 @@ export function terms(value) {
   return value.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((word) => word && !STOP_WORDS.has(word));
 }
 
-function conceptMatches(question, text) {
+function matchedConcepts(question, text) {
   const q = question.toLowerCase();
-  return CONCEPTS.filter(([, words]) => words.some((word) => q.includes(word)) && words.some((word) => text.includes(word))).length;
+  return CONCEPTS
+    .filter(([, words]) => words.some((word) => q.includes(word)) && words.some((word) => text.includes(word)))
+    .map(([concept]) => concept);
 }
 
 export function retrieve(question, chunks, limit = 4) {
@@ -25,9 +27,9 @@ export function retrieve(question, chunks, limit = 4) {
       const text = chunk.text.toLowerCase();
       const textTerms = new Set(terms(text));
       const overlap = [...qTerms].filter((term) => textTerms.has(term)).length;
-      const concepts = conceptMatches(question, `${chunk.heading} ${chunk.text}`.toLowerCase());
-      const score = (overlap / Math.max(qTerms.size, 1)) * 0.65 + Math.min(concepts * 0.2, 0.35);
-      return { ...chunk, score: Number(score.toFixed(3)) };
+      const concepts = matchedConcepts(question, `${chunk.heading} ${chunk.text}`.toLowerCase());
+      const score = (overlap / Math.max(qTerms.size, 1)) * 0.65 + Math.min(concepts.length * 0.2, 0.35);
+      return { ...chunk, score: Number(score.toFixed(3)), overlap, matchedConcepts: concepts };
     })
     .filter((chunk) => chunk.score >= 0.16)
     .sort((a, b) => b.score - a.score)

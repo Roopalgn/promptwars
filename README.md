@@ -9,7 +9,7 @@ The repository is intentionally small and dependency-free: a Node.js HTTP server
 ## What it demonstrates
 
 - Upload or load an agreement, then ask a focused question.
-- Parse numbered clauses into stable clause/page citation metadata.
+- Parse numbered clauses into stable clause citations, with extracted page markers when available and clearly labeled estimates for plain text.
 - Retrieve only relevant clauses and refuse questions that are not covered.
 - Show the source excerpt behind each answer.
 - Scan the full agreement against a small, reviewable gig/employment red-flag library.
@@ -55,8 +55,8 @@ The tests cover clause parsing, citation metadata, relevant retrieval, refusal w
 
 ## Assumptions and next steps
 
-The MVP assumes a single text-readable document per session and uses numbered headings as clause anchors. The lightweight PDF reader is a safe fallback for simple text PDFs; a production deployment should add a maintained PDF parser, persistent document sessions, authentication/rate limiting, and professional review of the red-flag taxonomy. Uploaded content is processed in memory and is not persisted.
+The MVP assumes a single text-readable `.txt` or `.md` document per session and uses numbered headings as clause anchors. Plain-text page labels are estimates unless the source contains explicit page markers; PDF and scanned-image extraction are intentionally not advertised until a maintained parser/OCR dependency is added. A production deployment should add that parser, persistent document sessions, authentication/rate limiting, and professional review of the red-flag taxonomy. Uploaded content is processed in memory and is not persisted.
 
 ## Why this is not just a generic chatbot
 
-The differentiator is the workflow: a hard refusal path when the source is silent, clause/page anchors for each supported claim, a curated domain-specific risk scan, and an accessible multilingual output designed for a worker about to sign an agreement.
+The differentiator is the workflow: a hard refusal path when the source is silent, clause anchors plus provenance-labeled page metadata for each supported claim, a curated domain-specific risk scan, and an accessible multilingual output designed for a worker about to sign an agreement.
