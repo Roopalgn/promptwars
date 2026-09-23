@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="SahiClause helps gig and first-job workers understand agreement clauses with source anchors." />
+    <title>SahiClause — understand before you sign</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Skip to workspace</a>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">§</span><span>Sahi<span>Clause</span></span></div>
+      <div class="header-note"><span class="status-dot"></span> Document-grounded assistance</div>
+    </header>
+    <main id="workspace" class="shell">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">FOR GIG &amp; FIRST-JOB WORKERS</p>
+          <h1 id="page-title">Understand what you are <em>agreeing to.</em></h1>
+          <p class="hero-copy">Ask about the clause that matters to you. SahiClause searches only your agreement, points back to the exact source, and says when the answer is not there.</p>
+        </div>
+        <div class="hero-stamp" aria-label="Built for clarity"><strong>01</strong><span>read<br />with<br />confidence</span></div>
+      </section>
+
+      <div class="notice" role="note"><span aria-hidden="true">ⓘ</span><span><strong>Reading aid, not legal advice.</strong> Results are grounded in the uploaded document. A qualified professional can help with your specific situation.</span></div>
+
+      <section class="workspace-grid">
+        <div class="input-column">
+          <section class="card setup-card" aria-labelledby="setup-title">
+            <div class="section-heading"><div><p class="eyebrow">STEP 01</p><h2 id="setup-title">Bring your agreement</h2></div><span class="step-badge">SOURCE</span></div>
+            <label class="dropzone" for="file-input" id="dropzone">
+              <span class="upload-icon" aria-hidden="true">↑</span>
+              <span><strong id="file-label">Drop a document here</strong><small>or choose a .txt, .md, or .pdf file · max 1.5 MB</small></span>
+              <input id="file-input" type="file" accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf" />
+            </label>
+            <div class="or-row"><span>OR</span></div>
+            <button class="sample-button" id="sample-button" type="button"><span aria-hidden="true">✦</span> Load a sample worker agreement</button>
+            <p class="file-status" id="file-status" role="status">No document loaded yet.</p>
+          </section>
+
+          <section class="card question-card" aria-labelledby="question-title">
+            <div class="section-heading"><div><p class="eyebrow">STEP 02</p><h2 id="question-title">Name your concern</h2></div><span class="step-badge">FOCUS</span></div>
+            <label for="question">What do you want to understand?</label>
+            <textarea id="question" rows="4" maxlength="500" placeholder="e.g. What is my notice period if I quit?"></textarea>
+            <div class="example-row" aria-label="Example questions">
+              <button type="button" class="chip">What can they deduct?</button>
+              <button type="button" class="chip">Can I work for a competitor?</button>
+            </div>
+            <div class="controls">
+              <label for="language">Answer language</label>
+              <select id="language"><option value="en">English</option><option value="hi">हिन्दी (Hindi)</option></select>
+            </div>
+            <button class="primary-button" id="analyze-button" type="button" disabled>Analyze my concern <span aria-hidden="true">→</span></button>
+            <p class="error" id="form-error" role="alert" hidden></p>
+          </section>
+        </div>
+
+        <div class="results-column" aria-live="polite">
+          <section class="empty-state" id="empty-state">
+            <div class="empty-orbit"><span>§</span></div>
+            <p class="eyebrow">YOUR GROUNDED ANSWER</p>
+            <h2>Start with one real question.</h2>
+            <p>Load the sample agreement or upload your own document. Your answer, source citation, red flags, and next steps will appear here.</p>
+          </section>
+          <div id="results" hidden>
+            <section class="card answer-card" aria-labelledby="answer-title">
+              <div class="result-topline"><p class="eyebrow">GROUNDED ANSWER</p><span id="coverage-badge" class="coverage-badge"></span></div>
+              <h2 id="answer-title">Here is what your document says</h2>
+              <p class="answer-text" id="answer-text"></p>
+              <div class="source-strip"><span class="source-pin" aria-hidden="true">⌖</span><div><strong>Source anchors</strong><span id="citation-count"></span></div></div>
+              <div id="citations" class="citations"></div>
+            </section>
+            <div class="result-two-col">
+              <section class="card flags-card" aria-labelledby="flags-title"><div class="card-title-row"><h2 id="flags-title">Worth a closer look</h2><span class="flag-count" id="flag-count"></span></div><div id="flags"></div></section>
+              <section class="card checklist-card" aria-labelledby="checklist-title"><div class="card-title-row"><h2 id="checklist-title">Your next questions</h2><span class="check-icon" aria-hidden="true">✓</span></div><ol id="checklist"></ol></section>
+            </div>
+            <section class="card ai-card" aria-labelledby="ai-title"><div class="card-title-row"><div><p class="eyebrow">TRANSPARENCY</p><h2 id="ai-title">See the AI at work</h2></div><span class="provider-pill" id="provider"></span></div><p class="ai-intro">The prompt below contains only your question and the retrieved clauses. This is the evidence trail behind the answer.</p><details><summary>Show prompt and response</summary><div class="debug-grid"><div><span class="debug-label">PROMPT IN</span><pre id="prompt-debug"></pre></div><div><span class="debug-label">RESPONSE OUT</span><pre id="response-debug"></pre></div></div></details></section>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer><span>SahiClause prototype</span><span>Built to make understanding easier, not to replace a lawyer.</span></footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

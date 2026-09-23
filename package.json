@@ -1,0 +1,14 @@
+{
+  "name": "sahiclause",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Clause-grounded legal document navigator for gig and first-job workers.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
