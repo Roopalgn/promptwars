@@ -22,6 +22,20 @@ test("retrieval finds the notice clause for a notice question", () => {
   assert.equal(results[0].clause, "Clause 2");
 });
 
+test("exclusivity questions agree with the exclusivity red flag", async () => {
+  const document = parseDocument({ filename: "agreement.txt", content });
+  for (const question of [
+    "Is there a non-compete clause?",
+    "Am I allowed to work for another delivery platform?",
+    "Can I work part-time for a competitor?",
+  ]) {
+    const result = await analyzeQuestion({ document, question });
+    assert.equal(result.status, "covered", question);
+    assert.equal(result.citations[0].clause, "Clause 4", question);
+    assert.ok(result.redFlags.some((flag) => flag.id === "broad-exclusivity"), question);
+  }
+});
+
 test("unknown question is refused instead of guessed", async () => {
   const document = parseDocument({ filename: "agreement.txt", content });
   const result = await analyzeQuestion({ document, question: "What happens to my stock options if I resign?" });
@@ -35,6 +49,12 @@ test("question with no document signal is refused without a disclaimer clause", 
   const result = await analyzeQuestion({ document, question: "Does this include visa sponsorship?" });
   assert.equal(result.status, "not-covered");
   assert.deepEqual(result.citations, []);
+});
+
+test("ordinary lexical overlap does not bypass the non-exclusivity grounding gate", async () => {
+  const document = parseDocument({ filename: "agreement.txt", content });
+  const result = await analyzeQuestion({ document, question: "What is the worker's name?" });
+  assert.equal(result.status, "not-covered");
 });
 
 test("plain text pages are marked as estimates while explicit markers are document pages", () => {

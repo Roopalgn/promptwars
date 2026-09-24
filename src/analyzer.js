@@ -49,7 +49,12 @@ function hasQuestionSignal(question, chunk) {
 }
 
 function isStronglyGrounded(chunk) {
-  return chunk && chunk.score >= 0.22 && chunk.overlap >= 1 && chunk.matchedConcepts.length > 0;
+  if (!chunk) return false;
+  const normalGrounding = chunk.score >= 0.22 && chunk.overlap >= 1 && chunk.matchedConcepts.length > 0;
+  // Exclusivity is the deliberate synonym exception: "non-compete" can be
+  // written as "exclusivity" or "competing platform" in the agreement.
+  const exclusivityGrounding = chunk.score >= 0.18 && chunk.matchedConcepts.includes("exclusive");
+  return normalGrounding || exclusivityGrounding;
 }
 
 function localAnswer(question, chunks, language) {

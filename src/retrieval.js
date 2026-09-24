@@ -3,7 +3,7 @@ const CONCEPTS = [
   ["notice", ["notice", "days", "period", "resign", "quit", "leave"]],
   ["termination", ["terminate", "termination", "deactivate", "suspend", "dismiss", "end"]],
   ["pay", ["pay", "payout", "payment", "deduct", "deduction", "fee", "commission", "earnings"]],
-  ["exclusive", ["exclusive", "exclusivity", "competitor", "non-compete", "noncompete", "outside work"]],
+  ["exclusive", ["exclusive", "exclusivity", "competitor", "competing", "non-compete", "noncompete", "outside work", "work elsewhere", "another platform", "delivery platform", "part-time"]],
   ["arbitration", ["arbitration", "dispute", "court", "tribunal", "jurisdiction"]],
   ["leave", ["leave", "holiday", "absence", "sick"]],
   ["data", ["data", "privacy", "personal information", "information"]],
